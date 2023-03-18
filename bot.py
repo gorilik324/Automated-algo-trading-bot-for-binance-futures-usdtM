@@ -121,6 +121,8 @@ analyzer = TechnicalAnalyzer(trader.key, trader.secret)
 
 # Define amplitude
 amplitude = 100
+period = 60 # 1 minute
+shift = 0.5 # 180 degrees in radians
 
 print()
 trading_pairs = [symbol['symbol'] for symbol in json.loads(requests.get('https://fapi.binance.com/fapi/v1/exchangeInfo').text)['symbols']
