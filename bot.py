@@ -119,6 +119,9 @@ filename = 'credentials.txt'
 trader = Trader(filename)
 analyzer = TechnicalAnalyzer(trader.key, trader.secret)
 
+# Define amplitude
+amplitude = 100
+
 print()
 trading_pairs = [symbol['symbol'] for symbol in json.loads(requests.get('https://fapi.binance.com/fapi/v1/exchangeInfo').text)['symbols']
                  if symbol['quoteAsset'] == 'USDT' and 'PERP' not in symbol['pair'].upper()]
@@ -139,14 +142,12 @@ for pair in trading_pairs:
                         scaled_wave = (sin_wave + 1) * (highest_line - lowest_line) / 2 + lowest_line
                         if current_price <= scaled_wave[0]:
                             print(f'{pair}: Buy signal on 1m timeframe')
-                            # Define amplitude
-                            amplitude = 100
                             # Set the entry and exit points
                             entry_point = 0.25 * amplitude
                             exit_point = 0.75 * amplitude
                            while True:
                                # Get current market price data
-                               current_price = get_current_price(pair)
+                               # current_price = get_current_price(pair)
                                # Calculate sine wave value based on time
                                t = time.time()  # get current time
                                sine_wave = amplitude * math.sin(2*math.pi/period*t + shift)
@@ -184,14 +185,12 @@ for pair in trading_pairs:
                             print(f'{pair}: Buy signal on 1m timeframe for mtf top')
                         elif current_price >= scaled_wave[-1]:
                             print(f'{pair}: Sell signal on 1m timeframe')
-                            # Define amplitude
-                            amplitude = 100
                             # Set the entry and exit points
                             entry_point = 0.75 * amplitude
                             exit_point = 0.25 * amplitude
                             while True:
                                 # Get current market price data
-                                current_price = get_current_price(pair)
+                                # current_price = get_current_price(pair)
                                 # Calculate sine wave value based on time
                                 t = time.time()  # get current time
                                 sine_wave = amplitude * math.sin(2*math.pi/period*t + shift)
