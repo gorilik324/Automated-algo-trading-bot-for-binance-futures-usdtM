@@ -198,9 +198,9 @@ for pair in trading_pairs:
                                 sine_wave = amplitude * math.sin(2*math.pi/period*t + shift)
                                 # Check if current market price is at or above the entry point
                                 if current_price >= entry_point:
-                                # Place automated sell order
-                                trader.sell(pair)
-                                #break
+                                    # Place automated sell order
+                                    trader.sell(pair)
+                                    #break
                                 # Check if current market price is at or below the exit point
                                 if current_price <= exit_point:
                                     # Close all positions and exit the market
