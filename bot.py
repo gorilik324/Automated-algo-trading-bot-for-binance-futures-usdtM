@@ -33,7 +33,13 @@ class Trader:
         headers = self._generate_header()
         response = requests.get(f'{self.base_url}{endpoint}', headers=headers)
         data = response.json()
-        return float(data['totalWalletBalance'])
+        #return float(data['totalWalletBalance'])
+        if 'totalWalletBalance' in data:
+            return float(data['totalWalletBalance'])
+        else:
+            return 0.0  # or any default value you want to return if the key does not exist
+
+
 
     def buy(self, symbol):
         endpoint = '/fapi/v1/order'
@@ -60,6 +66,29 @@ class Trader:
         }
         response = requests.post(f'{self.base_url}{endpoint}', headers=headers, params=params)
         return response.json()
+
+    def close_all_positions(self):
+        endpoint = '/fapi/v1/allOpenOrders'
+        headers = self._generate_header()
+        params = {
+            'timestamp': int(time.time() * 1000)
+        }
+        params['signature'] = self._generate_signature('&'.join([f"{k}={v}" for k,v in params.items()]))
+        response = requests.get(f'{self.base_url}{endpoint}', headers=headers, params=params)
+        orders = response.json()
+        for order in orders:
+            if order['symbol'] != 'BTCUSDT':
+                params = {
+                    'symbol': order['symbol'],
+                    'side': 'SELL',
+                    'type': 'MARKET',
+                    'quantity': order['quantity'],
+                    'timestamp': int(time.time() * 1000)
+                }
+                params['signature'] = self._generate_signature('&'.join([f"{k}={v}" for k,v in params.items()]))
+                response = requests.post(f'{self.base_url}/fapi/v1/order', headers=headers, params=params)
+                print(response.json())
+
 
 class TechnicalAnalyzer:
     def __init__(self, api_key, api_secret):
