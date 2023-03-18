@@ -142,27 +142,27 @@ for pair in trading_pairs:
                             # Set the entry and exit points
                             entry_point = 0.25 * amplitude
                             exit_point = 0.75 * amplitude
-                           while True:
-                               # Get current market price data
-                               current_price = get_current_price(pair)
-                               # Calculate sine wave value based on time
-                               t = time.time()  # get current time
-                               sine_wave = amplitude * math.sin(2*math.pi/period*t + shift)
-                               # Check if current market price is at or below the entry point
-                               if current_price <= entry_point:
-                                   # Place automated buy order
-                                   trader.buy(pair)
-                                   #break
-                               # Check if current market price is at or above the exit point
-                               if current_price >= exit_point:
-                                   # Close all positions and exit the market
-                                   trader.close_all_positions()
-                                   break
-                               # Print current market price and sine wave value
-                               print("Current Price:", current_price)
-                               print("Sine Wave:", sine_wave)
-                               # Wait for the next iteration
-                               time.sleep(5)
+                            while True:
+                                # Get current market price data
+                                current_price = get_current_price(pair)
+                                # Calculate sine wave value based on time
+                                t = time.time()  # get current time
+                                sine_wave = amplitude * math.sin(2*math.pi/period*t + shift)
+                                # Check if current market price is at or below the entry point
+                                if current_price <= entry_point:
+                                    # Place automated buy order
+                                    trader.buy(pair)
+                                    #break
+                                # Check if current market price is at or above the exit point
+                                if current_price >= exit_point:
+                                    # Close all positions and exit the market
+                                    trader.close_all_positions()
+                                    break
+                                # Print current market price and sine wave value
+                                print("Current Price:", current_price)
+                                print("Sine Wave:", sine_wave)
+                                # Wait for the next iteration
+                                time.sleep(5)
                         elif current_price >= scaled_wave[-1]:
                             print(f'{pair}: Sell signal on 1m timeframe for mtf dip')
     elif analyzer.identify_top(pair, '4h'):
@@ -194,8 +194,8 @@ for pair in trading_pairs:
                                 # Check if current market price is at or above the entry point
                                 if current_price >= entry_point:
                                 # Place automated sell order
-                                trader.sell(pair)
-                                #break
+                                    trader.sell(pair)
+                                    #break
                                 # Check if current market price is at or below the exit point
                                 if current_price <= exit_point:
                                     # Close all positions and exit the market
