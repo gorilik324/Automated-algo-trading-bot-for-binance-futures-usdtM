@@ -38,7 +38,7 @@ class Trader:
     def buy(self, symbol):
         endpoint = '/fapi/v1/order'
         headers = self._generate_header()
-        quantity = self.get_account_balance() / float(requests.get(f"{self.base_url}/fapi/v1/ticker/price?symbol={symbol}").json()['price'])
+        balance = self.get_account_balance() / float(requests.get(f"{self.base_url}/fapi/v1/ticker/price?symbol={symbol}").json()['price'])
         params = {
             'symbol': symbol,
             'side': 'BUY',
@@ -51,7 +51,7 @@ class Trader:
     def sell(self, symbol):
         endpoint = '/fapi/v1/order'
         headers = self._generate_header()
-        quantity = self.get_account_balance()
+        balance = self.get_account_balance()
         params = {
             'symbol': symbol,
             'side': 'SELL',
@@ -60,6 +60,19 @@ class Trader:
         }
         response = requests.post(f'{self.base_url}{endpoint}', headers=headers, params=params)
         return response.json()
+
+    def close_all_positions(self):
+        endpoint = '/fapi/v1/allOpenOrders'
+        headers = self._generate_header()
+        response = requests.get(f'{self.base_url}{endpoint}', headers=headers)
+        data = response.json()
+        for order in data:
+            params = {
+                'symbol': order['symbol'],
+                'orderId': order['orderId'],
+            }
+            response = requests.delete(f'{self.base_url}{endpoint}', headers=headers, params=params)
+            print(f"{order['symbol']} order {order['orderId']} closed: {response.json()}")
 
 class TechnicalAnalyzer:
     def __init__(self, api_key, api_secret):
@@ -85,16 +98,16 @@ class TechnicalAnalyzer:
     def identify_dip(self, symbol, interval):
         close_prices = self.get_historical_data(symbol, interval)
         fit_line = self.fit_line(close_prices)
-
+    
         lowest_line = np.min(fit_line)
         slope = np.polyfit(np.arange(len(fit_line)), fit_line, 1)[0]
-
+    
         if close_prices[-1] < lowest_line and slope < 0:
             print(f'{symbol}: Dip found on {interval} timeframe')
             return True
-
+     
         return False
-
+    
     def identify_top(self, symbol, interval):
         close_prices = self.get_historical_data(symbol, interval)
         fit_line = self.fit_line(close_prices)
@@ -123,6 +136,8 @@ analyzer = TechnicalAnalyzer(trader.key, trader.secret)
 amplitude = 100
 period = 60 # 1 minute
 shift = 0.5 # 180 degrees in radians
+
+timeframes = ['1d', '4h', '1h', '15m', '5m']
 
 print()
 trading_pairs = [symbol['symbol'] for symbol in json.loads(requests.get('https://fapi.binance.com/fapi/v1/exchangeInfo').text)['symbols']
